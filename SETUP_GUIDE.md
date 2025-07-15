@@ -134,19 +134,18 @@ function TowerModule:CreateTower(towerType, position)
         tower:SetAttribute("SplashRadius", towerData.SplashRadius)
     end
     
-    -- Create range indicator (initially invisible)
-    local rangeIndicator = Instance.new("Part")
-    rangeIndicator.Name = "RangeIndicator"
-    rangeIndicator.Size = Vector3.new(towerData.Range * 2, 0.1, towerData.Range * 2)
-    rangeIndicator.Position = position
-    rangeIndicator.Anchored = true
-    rangeIndicator.CanCollide = false
-    rangeIndicator.Transparency = 0.8
-    rangeIndicator.Color = Color3.fromRGB(0, 255, 0)
-    rangeIndicator.Shape = Enum.PartType.Cylinder
-    rangeIndicator.Orientation = Vector3.new(0, 0, 90)
-    rangeIndicator.Visible = false
-    rangeIndicator.Parent = tower
+         -- Create range indicator (initially invisible)
+     local rangeIndicator = Instance.new("Part")
+     rangeIndicator.Name = "RangeIndicator"
+     rangeIndicator.Size = Vector3.new(towerData.Range * 2, 0.1, towerData.Range * 2)
+     rangeIndicator.Position = position
+     rangeIndicator.Anchored = true
+     rangeIndicator.CanCollide = false
+     rangeIndicator.Transparency = 1 -- Fully transparent (invisible)
+     rangeIndicator.Color = Color3.fromRGB(0, 255, 0)
+     rangeIndicator.Shape = Enum.PartType.Cylinder
+     rangeIndicator.Orientation = Vector3.new(0, 0, 90)
+     rangeIndicator.Parent = tower
     
     return tower
 end
@@ -298,6 +297,11 @@ return TowerModule
 
 ### Issue: "lacking capability" error
 **Solution**: This is normal - you need to manually create ModuleScripts (Step 4)
+
+### Issue: "Visible is not a valid member of Part" error
+**Solution**: Use `Transparency` instead of `Visible` for 3D parts:
+- Replace `rangeIndicator.Visible = false` with `rangeIndicator.Transparency = 1`
+- Replace `rangeIndicator.Visible = true` with `rangeIndicator.Transparency = 0.8`
 
 ### Issue: Client script not running
 **Solution**: Make sure the LocalScript is in StarterPlayerScripts
