@@ -133,10 +133,12 @@ Edit `WaveModule.lua` to change wave compositions and difficulty scaling.
 
 ## 🎨 Visual Features
 
-- **Health Bars** - Dynamic health bars above enemies
+- **Enhanced Enemy UI** - Health bars, enemy names, and type icons above enemies
+- **Walking Animation** - Enemies walk naturally instead of teleporting
 - **Range Indicators** - Visual range display for selected towers
 - **Projectile System** - Animated projectiles with collision detection
 - **Particle Effects** - Explosions and coin effects
+- **Smart Collision** - Enemies collide with terrain but not players/each other
 - **UI System** - Clean, intuitive user interface
 
 ## 🔧 Technical Details

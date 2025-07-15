@@ -303,6 +303,9 @@ return TowerModule
 - Replace `rangeIndicator.Visible = false` with `rangeIndicator.Transparency = 1`
 - Replace `rangeIndicator.Visible = true` with `rangeIndicator.Transparency = 0.8`
 
+### Issue: Enemies teleporting instead of walking
+**Solution**: Make sure you're using the latest EnemyModule code that includes proper Humanoid:MoveTo() calls
+
 ### Issue: Client script not running
 **Solution**: Make sure the LocalScript is in StarterPlayerScripts
 
