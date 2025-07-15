@@ -266,7 +266,7 @@ function TowerPlacementClient:SelectTower(tower)
     -- Show range indicator
     local rangeIndicator = tower:FindFirstChild("RangeIndicator")
     if rangeIndicator then
-        rangeIndicator.Visible = true
+        rangeIndicator.Transparency = 0.8 -- Make it semi-transparent (visible)
     end
     
     -- Show sell UI
@@ -280,7 +280,7 @@ function TowerPlacementClient:DeselectTower()
         -- Hide range indicator
         local rangeIndicator = self.SelectedTower:FindFirstChild("RangeIndicator")
         if rangeIndicator then
-            rangeIndicator.Visible = false
+            rangeIndicator.Transparency = 1 -- Make it fully transparent (invisible)
         end
         
         self.SelectedTower = nil
@@ -357,8 +357,7 @@ function TowerPlacementClient:UpdatePlacementPreview()
             -- Show range indicator
             local rangeIndicator = self.PreviewTower:FindFirstChild("RangeIndicator")
             if rangeIndicator then
-                rangeIndicator.Visible = true
-                rangeIndicator.Transparency = 0.9
+                rangeIndicator.Transparency = 0.9 -- Make it very transparent for preview
             end
             
             self.PreviewTower.Parent = workspace

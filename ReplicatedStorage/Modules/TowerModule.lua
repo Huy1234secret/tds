@@ -85,11 +85,10 @@ function TowerModule:CreateTower(towerType, position)
     rangeIndicator.Position = position
     rangeIndicator.Anchored = true
     rangeIndicator.CanCollide = false
-    rangeIndicator.Transparency = 0.8
+    rangeIndicator.Transparency = 1 -- Fully transparent (invisible)
     rangeIndicator.Color = Color3.fromRGB(0, 255, 0)
     rangeIndicator.Shape = Enum.PartType.Cylinder
     rangeIndicator.Orientation = Vector3.new(0, 0, 90)
-    rangeIndicator.Visible = false
     rangeIndicator.Parent = tower
     
     return tower
