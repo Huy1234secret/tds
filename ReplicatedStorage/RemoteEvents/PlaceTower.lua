@@ -1,0 +1,2 @@
+-- This is a RemoteEvent for placing towers
+-- The actual RemoteEvent should be created in ReplicatedStorage/RemoteEvents as a RemoteEvent instance
