@@ -49,11 +49,44 @@ GameManager.WaveInProgress = false
 function GameManager:Init()
     print("Tower Defense Game Manager Initialized")
     self:SetupMap()
+    self:SetupCollisionGroups()
     self:ConnectEvents()
     
     -- Start the game after a short delay
     wait(3)
     self:StartGame()
+end
+
+function GameManager:SetupCollisionGroups()
+    local PhysicsService = game:GetService("PhysicsService")
+    
+    -- Create collision groups
+    pcall(function()
+        PhysicsService:CreateCollisionGroup("Enemies")
+        PhysicsService:CreateCollisionGroup("Players")
+    end)
+    
+    -- Set up collision rules
+    pcall(function()
+        PhysicsService:CollisionGroupSetCollidable("Enemies", "Enemies", false)
+        PhysicsService:CollisionGroupSetCollidable("Enemies", "Players", false)
+    end)
+    
+    -- Set up player collision when they join
+    Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function(character)
+            wait(1) -- Wait for character to fully load
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    pcall(function()
+                        PhysicsService:SetPartCollisionGroup(part, "Players")
+                    end)
+                end
+            end
+        end)
+    end)
+    
+    print("Collision groups set up successfully")
 end
 
 function GameManager:SetupMap()
@@ -152,6 +185,7 @@ function GameManager:GetPlayerData(player)
     if not player:GetAttribute("Money") then
         player:SetAttribute("Money", 100) -- Starting money
         player:SetAttribute("Lives", 20) -- Starting lives
+        print(player.Name .. " started with $100 and 20 lives")
     end
     
     return {
