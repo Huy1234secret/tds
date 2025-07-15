@@ -1,57 +1,67 @@
 -- WaveModule.lua - Handles wave generation and progression
 local WaveModule = {}
 
--- Wave definitions
+-- Wave definitions with time limits
 WaveModule.Waves = {
     [1] = {
         EnemyType = "Basic",
         EnemyCount = 5,
-        SpawnDelay = 1.5
+        SpawnDelay = 1.5,
+        TimeLimit = 60
     },
     [2] = {
         EnemyType = "Basic",
         EnemyCount = 8,
-        SpawnDelay = 1.2
+        SpawnDelay = 1.2,
+        TimeLimit = 58
     },
     [3] = {
         EnemyType = "Fast",
         EnemyCount = 6,
-        SpawnDelay = 1.0
+        SpawnDelay = 1.0,
+        TimeLimit = 56
     },
     [4] = {
         EnemyType = "Basic",
         EnemyCount = 10,
-        SpawnDelay = 1.0
+        SpawnDelay = 1.0,
+        TimeLimit = 54
     },
     [5] = {
         EnemyType = "Heavy",
         EnemyCount = 3,
-        SpawnDelay = 2.0
+        SpawnDelay = 2.0,
+        TimeLimit = 52
     },
     [6] = {
         EnemyType = "Fast",
         EnemyCount = 10,
-        SpawnDelay = 0.8
+        SpawnDelay = 0.8,
+        TimeLimit = 50
     },
     [7] = {
         EnemyType = "Flying",
         EnemyCount = 7,
-        SpawnDelay = 1.5
+        SpawnDelay = 1.5,
+        TimeLimit = 48
     },
     [8] = {
         EnemyType = "Heavy",
         EnemyCount = 5,
-        SpawnDelay = 1.8
+        SpawnDelay = 1.8,
+        TimeLimit = 46
     },
     [9] = {
         EnemyType = "Basic",
         EnemyCount = 15,
-        SpawnDelay = 0.7
+        SpawnDelay = 0.7,
+        TimeLimit = 44
     },
     [10] = {
         EnemyType = "Heavy",
         EnemyCount = 8,
-        SpawnDelay = 1.5
+        SpawnDelay = 1.5,
+        TimeLimit = 42
     }
 }
 

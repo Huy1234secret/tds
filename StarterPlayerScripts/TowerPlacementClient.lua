@@ -84,17 +84,17 @@ function TowerPlacementClient:CreateUI()
     moneyLabel.Font = Enum.Font.SourceSansBold
     moneyLabel.Parent = hudFrame
     
-    -- Lives display
-    local livesLabel = Instance.new("TextLabel")
-    livesLabel.Name = "LivesLabel"
-    livesLabel.Size = UDim2.new(1, 0, 0.33, 0)
-    livesLabel.Position = UDim2.new(0, 0, 0.33, 0)
-    livesLabel.BackgroundTransparency = 1
-    livesLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-    livesLabel.Text = "Lives: 20"
-    livesLabel.TextSize = 18
-    livesLabel.Font = Enum.Font.SourceSansBold
-    livesLabel.Parent = hudFrame
+    -- Base Health display
+    local baseHealthLabel = Instance.new("TextLabel")
+    baseHealthLabel.Name = "BaseHealthLabel"
+    baseHealthLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    baseHealthLabel.Position = UDim2.new(0, 0, 0.33, 0)
+    baseHealthLabel.BackgroundTransparency = 1
+    baseHealthLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    baseHealthLabel.Text = "Base Health: 20"
+    baseHealthLabel.TextSize = 18
+    baseHealthLabel.Font = Enum.Font.SourceSansBold
+    baseHealthLabel.Parent = hudFrame
     
     -- Wave display
     local waveLabel = Instance.new("TextLabel")
@@ -114,7 +114,7 @@ function TowerPlacementClient:CreateUI()
         TowerPanel = towerPanel,
         HUD = hudFrame,
         MoneyLabel = moneyLabel,
-        LivesLabel = livesLabel,
+        BaseHealthLabel = baseHealthLabel,
         WaveLabel = waveLabel
     }
     
@@ -389,12 +389,31 @@ function TowerPlacementClient:UpdateHUD()
     local money = player:GetAttribute("Money") or 0
     self.UI.MoneyLabel.Text = "Money: $" .. money
     
-    -- Update lives
-    local lives = player:GetAttribute("Lives") or 20
-    self.UI.LivesLabel.Text = "Lives: " .. lives
+    -- Update base health (check the base health part in workspace)
+    local baseHealth = workspace:FindFirstChild("BaseHealth")
+    if baseHealth and baseHealth:FindFirstChild("SurfaceGui") then
+        local gui = baseHealth.SurfaceGui
+        if gui:FindFirstChild("Frame") and gui.Frame:FindFirstChild("HealthLabel") then
+            local healthText = gui.Frame.HealthLabel.Text
+            self.UI.BaseHealthLabel.Text = healthText
+            
+            -- Extract the health number for color coding
+            local healthNumber = tonumber(healthText:match("%d+"))
+            if healthNumber then
+                if healthNumber <= 5 then
+                    self.UI.BaseHealthLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- Critical
+                elseif healthNumber <= 10 then
+                    self.UI.BaseHealthLabel.TextColor3 = Color3.fromRGB(255, 150, 0) -- Warning
+                else
+                    self.UI.BaseHealthLabel.TextColor3 = Color3.fromRGB(255, 100, 100) -- Normal
+                end
+            end
+        end
+    else
+        self.UI.BaseHealthLabel.Text = "Base Health: 20"
+    end
     
-    -- Update wave (this would need to be communicated from server)
-    -- For now, we'll leave it as is
+    -- Wave info is now updated by the server via UpdateWaveUI
 end
 
 -- Initialize the client

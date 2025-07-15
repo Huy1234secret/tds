@@ -164,9 +164,9 @@ function EnemyModule:SpawnEnemy(enemyType)
     -- Create health bar and name UI
     self:CreateEnemyUI(enemy, enemyType)
     
-    -- Handle death
+    -- Handle death (gameManager reference will be set when enemy starts moving)
     humanoid.Died:Connect(function()
-        self:OnEnemyDeath(enemy)
+        self:OnEnemyDeath(enemy, enemy._gameManagerRef)
     end)
     
     return enemy
@@ -272,7 +272,7 @@ function EnemyModule:CreateEnemyUI(enemy, enemyType)
     end)
 end
 
-function EnemyModule:MoveEnemyAlongPath(enemy)
+function EnemyModule:MoveEnemyAlongPath(enemy, gameManager)
     local humanoid = enemy:FindFirstChild("Humanoid")
     if not humanoid then return end
     
@@ -282,6 +282,9 @@ function EnemyModule:MoveEnemyAlongPath(enemy)
     
     local isFlying = enemy:GetAttribute("Flying")
     
+    -- Store gameManager reference for death handling  
+    enemy._gameManagerRef = gameManager
+    
     -- Set up walking animation
     if not isFlying then
         self:StartWalkingAnimation(enemy)
@@ -290,8 +293,8 @@ function EnemyModule:MoveEnemyAlongPath(enemy)
     while enemy.Parent and humanoid.Health > 0 do
         local waypoint = path:FindFirstChild("Waypoint" .. currentWaypoint)
         if not waypoint then
-            -- Reached the end, damage player
-            self:OnEnemyReachEnd(enemy)
+            -- Reached the end, damage base
+            self:OnEnemyReachEnd(enemy, gameManager)
             break
         end
         
@@ -402,7 +405,7 @@ function EnemyModule:StopWalkingAnimation(enemy)
     end
 end
 
-function EnemyModule:OnEnemyDeath(enemy)
+function EnemyModule:OnEnemyDeath(enemy, gameManager)
     local reward = enemy:GetAttribute("Reward")
     
     -- Give money to all players
@@ -412,36 +415,107 @@ function EnemyModule:OnEnemyDeath(enemy)
     end
     
     -- Remove from active enemies list
-    local GameManager = require(game.ServerScriptService:WaitForChild("GameManager"))
-    GameManager:RemoveEnemy(enemy)
+    if gameManager and gameManager.RemoveEnemy then
+        gameManager:RemoveEnemy(enemy)
+    else
+        -- Fallback
+        local ServerGameManager = require(game.ServerScriptService:WaitForChild("GameManager"))
+        if ServerGameManager and ServerGameManager.RemoveEnemy then
+            ServerGameManager:RemoveEnemy(enemy)
+        end
+    end
     
     -- Create death effect
     self:CreateDeathEffect(enemy.PrimaryPart.Position)
     
-    print("Enemy defeated! Players earned " .. reward .. " money.")
+    print("💀 Enemy defeated! Players earned $" .. reward)
     
     -- Clean up
     enemy:Destroy()
 end
 
-function EnemyModule:OnEnemyReachEnd(enemy)
-    -- Damage all players
-    for _, player in pairs(game.Players:GetPlayers()) do
-        local currentLives = player:GetAttribute("Lives") or 20
-        player:SetAttribute("Lives", math.max(0, currentLives - 1))
-        
-        if currentLives <= 1 then
-            print(player.Name .. " has lost the game!")
-        else
-            print(player.Name .. " lost a life! Lives remaining: " .. (currentLives - 1))
+function EnemyModule:OnEnemyReachEnd(enemy, gameManager)
+    -- Create disappearing effect
+    self:CreateDisappearEffect(enemy.PrimaryPart.Position)
+    
+    -- Damage the base through the game manager
+    if gameManager and gameManager.DamageBase then
+        gameManager:DamageBase(1)
+    else
+        -- Fallback if gameManager not available
+        local ServerGameManager = require(game.ServerScriptService:WaitForChild("GameManager"))
+        if ServerGameManager and ServerGameManager.DamageBase then
+            ServerGameManager:DamageBase(1)
         end
     end
     
     -- Remove from active enemies list
-    local GameManager = require(game.ServerScriptService:WaitForChild("GameManager"))
-    GameManager:RemoveEnemy(enemy)
+    if gameManager and gameManager.RemoveEnemy then
+        gameManager:RemoveEnemy(enemy)
+    else
+        -- Fallback
+        local ServerGameManager = require(game.ServerScriptService:WaitForChild("GameManager"))
+        if ServerGameManager and ServerGameManager.RemoveEnemy then
+            ServerGameManager:RemoveEnemy(enemy)
+        end
+    end
     
+    print("👻 Enemy reached the base and disappeared!")
+    
+    -- Destroy the enemy
     enemy:Destroy()
+end
+
+function EnemyModule:CreateDisappearEffect(position)
+    -- Create teleportation/disappear effect
+    local effect1 = Instance.new("Explosion")
+    effect1.Position = position
+    effect1.BlastRadius = 3
+    effect1.BlastPressure = 0
+    effect1.Visible = true
+    effect1.Parent = workspace
+    
+    -- Create magical particles
+    for i = 1, 8 do
+        local particle = Instance.new("Part")
+        particle.Name = "DisappearParticle"
+        particle.Size = Vector3.new(0.5, 0.5, 0.5)
+        particle.Shape = Enum.PartType.Ball
+        particle.Color = Color3.fromRGB(255, 0, 255) -- Magenta
+        particle.Position = position + Vector3.new(
+            math.random(-3, 3),
+            math.random(0, 5),
+            math.random(-3, 3)
+        )
+        particle.CanCollide = false
+        particle.Anchored = false
+        particle.Parent = workspace
+        
+        -- Make particles float up and fade
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        bodyVelocity.Velocity = Vector3.new(
+            math.random(-5, 5),
+            math.random(10, 20),
+            math.random(-5, 5)
+        )
+        bodyVelocity.Parent = particle
+        
+        -- Fade out effect
+        spawn(function()
+            for alpha = 0, 1, 0.05 do
+                if particle.Parent then
+                    particle.Transparency = alpha
+                end
+                wait(0.05)
+            end
+            if particle.Parent then
+                particle:Destroy()
+            end
+        end)
+        
+        game:GetService("Debris"):AddItem(particle, 2)
+    end
 end
 
 function EnemyModule:CreateDeathEffect(position)
