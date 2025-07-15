@@ -3,6 +3,32 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
+-- Make sure setup is complete before proceeding
+local setupComplete = false
+repeat
+    local modules = ReplicatedStorage:FindFirstChild("Modules")
+    local remoteEvents = ReplicatedStorage:FindFirstChild("RemoteEvents")
+    
+    if modules and remoteEvents then
+        local towerModule = modules:FindFirstChild("TowerModule")
+        local enemyModule = modules:FindFirstChild("EnemyModule")
+        local waveModule = modules:FindFirstChild("WaveModule")
+        local placeTowerEvent = remoteEvents:FindFirstChild("PlaceTower")
+        local sellTowerEvent = remoteEvents:FindFirstChild("SellTower")
+        
+        if towerModule and enemyModule and waveModule and placeTowerEvent and sellTowerEvent then
+            setupComplete = true
+        end
+    end
+    
+    if not setupComplete then
+        print("Waiting for modules and events to be set up...")
+        wait(1)
+    end
+until setupComplete
+
+print("All required modules and events found! Starting GameManager...")
+
 -- Wait for ReplicatedStorage objects
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local PlaceTowerEvent = RemoteEvents:WaitForChild("PlaceTower")
